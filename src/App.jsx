@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { api } from './api';
 import { Field } from './components/ui';
+import BirthdayReminder from './components/BirthdayReminder';
 import Dashboard from './pages/Dashboard';
 import PDV from './pages/PDV';
 import Caixa from './pages/Caixa';
@@ -195,6 +196,7 @@ export default function App() {
           <Route path="/configuracoes" element={adminOnly(<Configuracoes />)} />
           <Route path="*" element={<Navigate to={home} replace />} />
         </Routes>
+        <BirthdayReminder />
       </Layout>
     </AppCtx.Provider>
   );

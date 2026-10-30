@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Save, Printer, Cloud, Usb, FolderOpen, Trash2, HardDrive, Upload, Plus, CircleCheck, TriangleAlert, RefreshCw } from 'lucide-react';
 import { api, isElectron } from '../api';
 import { useApp } from '../App';
 import { Modal, Field, useLoad, useAction, useConfirm, PageHeader, Loading, Tabs, Empty, useToast } from '../components/ui';
-import { dateTime, bytes } from '../lib/format';
+import { dateTime, bytes, birthdayMessage, DEFAULT_BIRTHDAY_MESSAGE } from '../lib/format';
 import { printHtml, saleReceipt } from '../lib/print';
 
 function useSettingsForm() {
@@ -280,6 +280,42 @@ function Regras() {
   );
 }
 
+const MESSAGE_VARS = [['{nome}', 'Primeiro nome do cliente'], ['{nome_completo}', 'Nome completo do cliente'], ['{loja}', 'Nome da loja']];
+
+function Aniversarios() {
+  const { s, set, save, busy, setS } = useSettingsForm();
+  const ref = useRef(null);
+  const text = s.birthday_message || '';
+  // Insere a variável onde está o cursor
+  const insert = (v) => {
+    const el = ref.current;
+    const a = el ? el.selectionStart : text.length, b = el ? el.selectionEnd : text.length;
+    setS({ ...s, birthday_message: text.slice(0, a) + v + text.slice(b) });
+    setTimeout(() => { if (el) { el.focus(); el.setSelectionRange(a + v.length, a + v.length); } });
+  };
+  return (
+    <div className="card card-body" style={{ maxWidth: 760 }}>
+      <div className="form-grid">
+        <Field label="Mensagem de parabéns enviada pelo WhatsApp" className="c-12" hint="Clique numa variável para colocá-la onde está o cursor. Para emojis, use Windows + ponto (.)">
+          <textarea ref={ref} className="textarea" rows={5} value={text} onChange={set('birthday_message')} />
+        </Field>
+        <div className="c-12 chip-list">
+          {MESSAGE_VARS.map(([v, label]) => <button key={v} type="button" className="chip" title={label} onClick={() => insert(v)}>{v}<span className="muted small">— {label}</span></button>)}
+        </div>
+        <div className="c-12">
+          <div className="small muted" style={{ marginBottom: 4 }}>Como o cliente vai receber (exemplo: Maria Souza)</div>
+          <div className="card card-body" style={{ whiteSpace: 'pre-wrap', background: 'var(--surface-2)' }}>{birthdayMessage({ name: 'Maria Souza' }, s)}</div>
+        </div>
+        <label className="checkbox c-12"><input type="checkbox" checked={s.birthday_popup === '1'} onChange={set('birthday_popup')} />Avisar os aniversariantes (de hoje e dos próximos 7 dias) na primeira vez que cada usuário entra no sistema no dia</label>
+      </div>
+      <div className="row end mt">
+        <button className="btn" onClick={() => setS({ ...s, birthday_message: DEFAULT_BIRTHDAY_MESSAGE })}>Restaurar mensagem padrão</button>
+        <button className="btn btn-primary" disabled={busy} onClick={() => save(['birthday_message', 'birthday_popup'])}><Save size={16} />Salvar</button>
+      </div>
+    </div>
+  );
+}
+
 function Senha() {
   const [f, setF] = useState({ current: '', password: '', password2: '' });
   const [run, busy] = useAction();
@@ -306,13 +342,14 @@ export default function Configuracoes() {
       <PageHeader title="Configurações" />
       <Tabs value={tab} onChange={setTab} tabs={[
         { id: 'loja', label: 'Dados da loja' }, { id: 'impressora', label: 'Impressora' }, { id: 'backup', label: 'Backup' },
-        { id: 'usuarios', label: 'Usuários' }, { id: 'regras', label: 'Regras e limites' }, { id: 'senha', label: 'Minha senha' },
+        { id: 'usuarios', label: 'Usuários' }, { id: 'regras', label: 'Regras e limites' }, { id: 'aniversarios', label: 'Aniversários' }, { id: 'senha', label: 'Minha senha' },
       ]} />
       {tab === 'loja' && <Loja />}
       {tab === 'impressora' && <Impressora />}
       {tab === 'backup' && <Backup />}
       {tab === 'usuarios' && <Usuarios />}
       {tab === 'regras' && <Regras />}
+      {tab === 'aniversarios' && <Aniversarios />}
       {tab === 'senha' && <Senha />}
     </>
   );

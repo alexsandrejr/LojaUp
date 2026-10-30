@@ -3,7 +3,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianG
 import { TriangleAlert, CircleCheck, Info, Lightbulb, RefreshCw, ShoppingCart, Gift, PackageMinus, TrendingUp, ChevronRight } from 'lucide-react';
 import { useApp } from '../App';
 import { useLoad, Loading, Empty, Stat } from '../components/ui';
-import { brl, date, num, whatsappLink } from '../lib/format';
+import { birthdayMessage, brl, date, num, whatsappLink } from '../lib/format';
 
 const ICONS = { danger: TriangleAlert, warning: TriangleAlert, success: CircleCheck, info: Lightbulb };
 
@@ -129,7 +129,7 @@ export default function Dashboard() {
           <div className="card-header"><Gift size={17} /><h3>Aniversariantes da semana</h3><span className="muted small">Uma mensagem com um cupom traz o cliente de volta.</span></div>
           <div className="card-body row wrap">
             {d.birthdays.map((b) => (
-              <a key={b.id} className="chip" href={whatsappLink(b.phone, `Feliz aniversário, ${b.name.split(' ')[0]}! 🎉 A ${settings.store_name} preparou um presente especial para você. Venha nos visitar!`) || undefined} target="_blank" rel="noreferrer">
+              <a key={b.id} className="chip" href={whatsappLink(b.phone, birthdayMessage(b, settings)) || undefined} target="_blank" rel="noreferrer">
                 🎂 {b.name} — {date(b.birth_date).slice(0, 5)}
               </a>
             ))}

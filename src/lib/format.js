@@ -71,4 +71,15 @@ export const whatsappLink = (phone, text = '') => {
   const d = String(phone || '').replace(/\D/g, '');
   return d ? `https://wa.me/55${d}?text=${encodeURIComponent(text)}` : null;
 };
-export const bytes = (n) => (n > 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.ceil(n / 1024)} KB`);
+
+// Mesmo texto do padrão birthday_message em electron/api/util.js
+export const DEFAULT_BIRTHDAY_MESSAGE = 'Feliz aniversário, {nome}! 🎉 A {loja} preparou um presente especial para você. Venha nos visitar!';
+// Mensagem de aniversário configurada, com {nome}, {nome_completo} e {loja} preenchidos
+export function birthdayMessage(customer, settings) {
+  const name = String(customer.name || '').trim();
+  return (String(settings.birthday_message || '').trim() || DEFAULT_BIRTHDAY_MESSAGE)
+    .replace(/\{nome\}/gi, name.split(/\s+/)[0])
+    .replace(/\{nome_completo\}/gi, name)
+    .replace(/\{loja\}/gi, settings.store_name || '');
+}
+export const bytes =(n) => (n > 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.ceil(n / 1024)} KB`);

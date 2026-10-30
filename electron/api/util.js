@@ -75,6 +75,9 @@ const SETTING_DEFAULTS = {
   backup_keep: '30',
   last_backup_at: '',
   return_days: '30',
+  // Mesmo texto de DEFAULT_BIRTHDAY_MESSAGE em src/lib/format.js
+  birthday_message: 'Feliz aniversário, {nome}! 🎉 A {loja} preparou um presente especial para você. Venha nos visitar!',
+  birthday_popup: '1',
 };
 
 function getSetting(key) {

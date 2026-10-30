@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const dbm = require('../db');
-const { fail, r2, requireUser, requireAdmin, localDate, daysBetween, getSettingNum } = require('./util');
+const { fail, r2, requireUser, requireAdmin, localDate, addDays, daysBetween, getSettingNum } = require('./util');
 
 // Juros e multa de uma parcela em atraso (sugestão — o operador pode dispensar)
 function lateCharges(ins, today = localDate()) {
@@ -70,6 +70,28 @@ module.exports = {
       return rows.filter((r) => r.birth_date && r.birth_date.slice(5, 7) === m);
     }
     return rows;
+  },
+
+  // Aniversariantes de hoje e dos próximos dias (aviso ao entrar no sistema)
+  'customers.birthdays': ({ days = 7 } = {}, ctx) => {
+    requireUser(ctx);
+    const today = localDate();
+    const year = Number(today.slice(0, 4));
+    const leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+    const ahead = new Map();
+    for (let k = 0; k <= days; k++) ahead.set(addDays(today, k).slice(5), k);
+    const rows = dbm.get().prepare("SELECT id, name, phone, birth_date FROM customers WHERE active = 1 AND birth_date IS NOT NULL AND birth_date <> '' ORDER BY name").all();
+    const out = { today: [], upcoming: [], month_count: 0 };
+    for (const c of rows) {
+      let md = c.birth_date.slice(5, 10);
+      if (md === '02-29' && !leap) md = '02-28';
+      if (md.slice(0, 2) === today.slice(5, 7)) out.month_count++;
+      const k = ahead.get(md);
+      if (k === 0) out.today.push(c);
+      else if (k != null) out.upcoming.push({ ...c, days_until: k });
+    }
+    out.upcoming.sort((a, b) => a.days_until - b.days_until || a.name.localeCompare(b.name));
+    return out;
   },
 
   'customers.get': ({ id }, ctx) => {

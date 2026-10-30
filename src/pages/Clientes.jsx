@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { UserPlus, Search, Users } from 'lucide-react';
+import { UserPlus, Search, Users, MessageCircle } from 'lucide-react';
 import { api } from '../api';
 import { useApp } from '../App';
 import { Modal, Field, MoneyInput, useLoad, useAction, PageHeader, Empty, Loading, Segmented } from '../components/ui';
-import { brl, date, formatCpf, formatPhone } from '../lib/format';
+import { birthdayMessage, brl, date, formatCpf, formatPhone, whatsappLink } from '../lib/format';
 
 export function CustomerForm({ initial = {}, onClose, onSaved }) {
   const { isAdmin } = useApp();
@@ -43,6 +43,7 @@ export default function Clientes() {
   const [filter, setFilter] = useState(params.get('filter') || '');
   const [editing, setEditing] = useState(null);
   const nav = useNavigate();
+  const { settings } = useApp();
   const { data, loading, reload } = useLoad('customers.list', { search, filter }, [search, filter]);
 
   return (
@@ -70,7 +71,12 @@ export default function Clientes() {
                     <td className="strong">{c.name}</td>
                     <td>{formatCpf(c.cpf)}</td>
                     <td>{formatPhone(c.phone)}</td>
-                    <td>{c.birth_date ? date(c.birth_date).slice(0, 5) : '—'}</td>
+                    <td className="nowrap">
+                      {c.birth_date ? date(c.birth_date).slice(0, 5) : '—'}
+                      {filter === 'aniversariantes' && c.phone && (
+                        <a className="btn btn-ghost btn-icon btn-sm" style={{ marginLeft: 6 }} title="Enviar parabéns no WhatsApp" href={whatsappLink(c.phone, birthdayMessage(c, settings))} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}><MessageCircle size={15} /></a>
+                      )}
+                    </td>
                     <td>{c.last_purchase ? date(c.last_purchase) : '—'}</td>
                     <td className="num">{brl(c.total_spent)}</td>
                     <td className="num">{c.balance > 0 ? brl(c.balance) : '—'}</td>
