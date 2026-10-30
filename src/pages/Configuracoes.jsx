@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Save, Printer, Cloud, Usb, FolderOpen, Trash2, HardDrive, Upload, Plus, CircleCheck, TriangleAlert, RefreshCw } from 'lucide-react';
-import { api, isElectron } from '../api';
+import { api } from '../api';
 import { useApp } from '../App';
 import { Modal, Field, useLoad, useAction, useConfirm, PageHeader, Loading, Tabs, Empty, useToast } from '../components/ui';
 import { dateTime, bytes, birthdayMessage, DEFAULT_BIRTHDAY_MESSAGE } from '../lib/format';
@@ -99,10 +99,6 @@ function Backup() {
   }
   const addFolder = (d) => { if (!dests.some((x) => x.type === d.type && x.path === d.path)) saveDests([...dests, d]); };
 
-  async function chooseFolder() {
-    const folder = await api('system.chooseFolder', { title: 'Escolha a pasta para os backups' });
-    if (folder) addFolder({ type: 'folder', path: folder, label: folder });
-  }
   async function runNow() {
     const r = await run(() => api('backup.run'));
     setResults(r);
@@ -147,7 +143,6 @@ function Backup() {
                 <button key={p} className="btn" onClick={() => addFolder({ type: 'folder', path: `${p}\\Backup LojaUp`, label: 'OneDrive' })}><Cloud size={16} />Usar OneDrive{info.oneDrive.length > 1 ? ` (${p.split('\\').pop()})` : ''}</button>
               ))}
               {!dests.some((d) => d.type === 'pendrive') && <button className="btn" onClick={() => addFolder({ type: 'pendrive' })}><Usb size={16} />Pendrive</button>}
-              {isElectron() && <button className="btn" onClick={chooseFolder}><Plus size={16} />Outra pasta…</button>}
             </div>
             {!info.oneDrive.length && <div className="small muted">OneDrive não encontrado neste computador. Instale e entre com a conta Microsoft para ter backup na nuvem.</div>}
           </div>
@@ -184,9 +179,7 @@ function Backup() {
         </div>
 
         <div className="card">
-          <div className="card-header"><Upload size={17} /><h3>Restaurar backup</h3>
-            <div className="actions">{isElectron() && <button className="btn btn-sm" onClick={async () => restore(await api('system.chooseFile', { title: 'Escolha o arquivo de backup' }))}>Escolher arquivo…</button>}</div>
-          </div>
+          <div className="card-header"><Upload size={17} /><h3>Restaurar backup</h3></div>
           {!files?.length ? <Empty>Nenhum backup encontrado nas pastas configuradas.</Empty> : (
             <div className="table-wrap" style={{ maxHeight: 260 }}>
               <table className="table table-compact">

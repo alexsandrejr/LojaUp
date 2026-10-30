@@ -1,11 +1,15 @@
-// Chamada à API local (Electron IPC; em desenvolvimento no navegador usa a ponte HTTP)
+// Chamada à API do servidor (POST /api)
 export async function api(method, args) {
+  const r = await fetch('/api', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ method, args }),
+  });
   let res;
-  if (window.lojaup) {
-    res = await window.lojaup.call(method, args);
-  } else {
-    const r = await fetch('http://127.0.0.1:5174', { method: 'POST', body: JSON.stringify({ method, args }) });
+  try {
     res = await r.json();
+  } catch (e) {
+    throw new Error(`Servidor indisponível (HTTP ${r.status}).`);
   }
   if (!res.ok) {
     const err = new Error(res.error || 'Erro desconhecido');
@@ -14,5 +18,3 @@ export async function api(method, args) {
   }
   return res.data;
 }
-
-export const isElectron = () => !!window.lojaup;

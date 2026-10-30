@@ -1,5 +1,4 @@
 import JsBarcode from 'jsbarcode';
-import { api, isElectron } from '../api';
 import { brl, date, dateTime, methodLabel, formatCpf } from './format';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -190,21 +189,11 @@ export function labelsDoc(items, settings, { mode = 'a4', width = 50, height = 3
   </style></head><body><div class="sheet">${all.map(label).join('')}</div></body></html>`;
 }
 
-// Envia para impressão. thermal=true usa a largura da bobina e impressora configuradas.
-export async function printHtml(html, settings, { thermal = true, dialog = false } = {}) {
-  if (!isElectron()) {
-    const w = window.open('', '_blank', 'width=420,height=700');
-    if (!w) return;
-    w.document.write(html);
-    w.document.close();
-    setTimeout(() => w.print(), 300);
-    return;
-  }
-  const silent = !dialog && settings.print_silent === '1' && !!settings.printer_name;
-  await api('print.html', {
-    html,
-    silent,
-    deviceName: thermal ? settings.printer_name || undefined : undefined,
-    widthMm: thermal ? Number(settings.printer_width) || 80 : undefined,
-  });
+// Envia para impressão pela janela do navegador
+export async function printHtml(html) {
+  const w = window.open('', '_blank', 'width=420,height=700');
+  if (!w) return;
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 300);
 }

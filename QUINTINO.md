@@ -70,9 +70,59 @@ Regras de cálculo principais:
 6. **Calculadora de preço** usando o custo real do produto.
 7. Ajustes de texto: o projeto foi feito para loja de roupas (grade cor × tamanho, trocas etc.).
 
+## Migração para web (Vercel + Supabase)
+
+Decidido em 30/10/2026. O sistema deixa de ser desktop (Electron) e vira um site, para o Samuel usar no
+celular e no computador, de qualquer lugar. **Não haverá mais versão desktop.**
+
+Decisões:
+
+- **Vercel** (telas + API) e **Supabase** (banco Postgres, região São Paulo), nos planos grátis.
+  O Hobby da Vercel é, pelos termos, só para uso não comercial. O risco é baixo (sistema privado, um
+  usuário, pouco uso) e os dados ficam no Supabase: se a Vercel bloquear, só as telas saem do ar e dá para
+  publicá-las na Cloudflare Pages. Por isso o código não deve depender de nada específico da Vercel.
+- Turso + Cloudflare foi descartado: limite de 10 ms de CPU e 50 chamadas externas por requisição no plano
+  grátis da Cloudflare, e o Turso foi comprado pelo Supabase em 02/10/2026.
+- A transformação inteira é feita aqui. O Samuel só cria as contas, cola as variáveis de ambiente e publica,
+  seguindo o `PUBLICAR.md` (escrito na fase 9). Antes de entregar, fazer uma publicação de teste em contas
+  próprias para validar o guia.
+- Desenvolvimento e testes usam **PGlite** (Postgres que roda dentro do Node, sem instalar nada). Sem a
+  variável de conexão, o sistema usa o PGlite local; com ela, usa o Supabase.
+- Login continua por **nome de usuário**, com sessão por acesso (cookie) e bloqueio após senhas erradas.
+- **Backup**: diário pelo GitHub Actions, guardado no repositório privado (isso também impede o Supabase de
+  pausar por inatividade), mais os botões "Baixar backup" e "Restaurar backup".
+- **Impressão** pelo navegador. Hoje o Samuel não usa impressora térmica, mas vai usar: manter os modelos de
+  80/58 mm e documentar como o Chrome imprime direto sem perguntar.
+- Repositório: privado no GitHub. No fim, transferir para a conta do Samuel ou adicioná-lo como colaborador.
+- Fora do escopo por enquanto: catálogo de produtos, fotos e as lacunas listadas acima.
+
+Como fica:
+
+```
+Celular / PC ──► Vercel ──► telas React
+                       └──► /api (uma função Node com as regras de negócio)
+                                  └──► Supabase Postgres (São Paulo)
+```
+
+A camada de banco imita a interface atual do `better-sqlite3` (`prepare(sql).get/all/run` e transações),
+só que assíncrona. Assim os módulos da API mudam pouco: ganham `await` e ajustes de SQL.
+
+Fases (marcar ao concluir, com commit ao fim de cada uma):
+
+- [ ] 0. Repositório privado no GitHub e troca da origem (hoje aponta para `pixel444-dev/LojaUp`)
+- [x] 1. Tirar o Electron: entrada `api/` para a Vercel e servidor local para desenvolvimento
+- [ ] 2. Camada de banco compatível, esquema Postgres, `npm run migrate`, RLS ligado em todas as tabelas
+- [ ] 3. Portar os módulos da API para Postgres e fixar o fuso `America/Sao_Paulo`
+- [ ] 4. Login com sessão em cookie, expiração e bloqueio por tentativas
+- [ ] 5. Impressão pelo navegador
+- [ ] 6. Backup: GitHub Actions diário + baixar/restaurar em Configurações
+- [ ] 7. Teste automático do roteiro (custo com frete, vendas, estoque, caixa, crediário, trocas)
+- [ ] 8. Layout para celular (menu, tabelas, formulários; PDV, Produtos, Estoque, Painel, Clientes)
+- [ ] 9. `PUBLICAR.md`, publicação de teste e entrega ao Samuel
+
 ## Alterações já feitas
 
-Em 29/10/2026. **Ainda não estão no git** (nenhum commit feito).
+Em 29/10/2026, no commit `cc52b4a`.
 
 1. **Alinhamento das tabelas** (`src/styles.css`): os títulos das colunas numéricas ficavam à esquerda e os
    valores à direita, porque `.table th { text-align: left }` vinha depois de `th.num` no CSS e ganhava.
@@ -101,11 +151,7 @@ falta conferir na tela a janela de aviso e a aba Aniversários.
 
 ## Como rodar
 
-Requisitos neste PC:
-
-- Node.js 22 ou superior (instalado: 24.20).
-- Não precisa de compilador C++: o `better-sqlite3` 13 já traz o binário pronto para Windows
-  (`prebuilds/win32-x64.node`, N-API), e ele funciona no Electron.
+Requisito: Node.js 22 ou superior (instalado neste PC: 24.20).
 
 ```bash
 npm install
@@ -115,41 +161,27 @@ npm install
 npm run dev
 ```
 
-**Atenção ao rodar pelo terminal do VS Code:** ele define `ELECTRON_RUN_AS_NODE=1`, e com isso o app
-quebra ao abrir (`Cannot read properties of undefined (reading 'setPath')` em `electron/main.js`). Nesse
-terminal, rode assim:
+Depois abra http://localhost:5173 no navegador. O comando sobe dois servidores: o Vite (telas, porta 5173)
+e a API local (`server/dev.js`, porta 5174). O Vite repassa as chamadas de `/api` para a API. Mudanças nas
+telas aparecem na hora, e a API reinicia sozinha quando um arquivo de `server/` muda.
 
-```bash
-env -u ELECTRON_RUN_AS_NODE npm run dev
-```
+No primeiro uso o sistema pede o nome da loja e cria o usuário administrador.
 
-No PowerShell: `Remove-Item Env:ELECTRON_RUN_AS_NODE; npm run dev`. Num terminal comum do Windows,
-`npm run dev` funciona direto.
-
-Mudanças nas telas (`src/`) aparecem na hora. Mudanças em `electron/` só valem depois de fechar e abrir o
-app de novo.
-
-`npm run dev` abre o app com recarregamento automático (F12 abre o DevTools). No primeiro uso ele pede o
-nome da loja e cria o usuário administrador.
+Os dados de desenvolvimento ficam na pasta `.data/` do projeto (fora do git). Para começar do zero, pare o
+`npm run dev` e apague essa pasta.
 
 Outros comandos:
 
-- `npm start`: gera o build das telas e abre o app sem o servidor de desenvolvimento.
-- `npm run dist`: gera o instalador em `release/LojaUp Setup 1.0.0.exe`.
-
-Onde ficam os dados:
-
-- Desenvolvimento: `%APPDATA%\LojaUp-dev\dados\loja.db`
-- Instalado: `%APPDATA%\LojaUp\dados\loja.db`
-
-Para começar do zero durante os testes, feche o app e apague a pasta `%APPDATA%\LojaUp-dev`.
+- `npm run build`: gera as telas prontas para publicar em `dist/`.
 
 ## Mapa do código
 
 ```
-electron/main.js        janela, IPC, impressão, backup agendado
-electron/db.js          SQLite e migrações (adicione novas entradas em MIGRATIONS; nunca altere as antigas)
-electron/api/           regras de negócio: auth, products, sales, customers, purchases, finance, reports, backup
+server/handler.js       despacha as chamadas "modulo.acao" para os módulos da API
+server/dev.js           servidor local de desenvolvimento (POST /api)
+server/db.js            banco de dados e migrações (adicione novas entradas em MIGRATIONS; nunca altere as antigas)
+server/api/             regras de negócio: auth, products, sales, customers, purchases, finance, reports, backup
+src/api.js              chamada à API pelas telas
 src/pages/              telas React (PDV, Vendas, Compras, Estoque, Financeiro, Relatórios, Configurações...)
 src/components/ui.jsx   componentes compartilhados
 src/lib/print.js        cupom, recibo, carnê, etiquetas
@@ -170,6 +202,5 @@ src/lib/print.js        cupom, recibo, carnê, etiquetas
 
 ## Próximos passos
 
-- Fazer o commit das alterações acima.
-- Continuar o roteiro de teste.
-- Atacar as lacunas da seção "O que falta adaptar". Nenhuma delas foi feita ainda.
+- Seguir as fases da [migração para web](#migração-para-web-vercel--supabase).
+- As lacunas da seção "O que falta adaptar" ficam para depois da migração.
