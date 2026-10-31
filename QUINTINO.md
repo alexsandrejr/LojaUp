@@ -113,7 +113,7 @@ Fases (marcar ao concluir, com commit ao fim de cada uma):
 - [x] 1. Tirar o Electron: entrada `api/` para a Vercel e servidor local para desenvolvimento
 - [x] 2. Camada de banco compatível, esquema Postgres, `npm run migrate`, RLS ligado em todas as tabelas
 - [x] 3. Portar os módulos da API para Postgres e fixar o fuso `America/Sao_Paulo`
-- [ ] 4. Login com sessão em cookie, expiração e bloqueio por tentativas
+- [x] 4. Login com sessão em cookie, expiração e bloqueio por tentativas
 - [ ] 5. Impressão pelo navegador
 - [ ] 6. Backup: GitHub Actions diário + baixar/restaurar em Configurações
 - [x] 7. Teste automático do roteiro (custo com frete, vendas, estoque, caixa, crediário, trocas)
@@ -182,7 +182,10 @@ Outros comandos:
 ## Mapa do código
 
 ```
-server/handler.js       despacha as chamadas "modulo.acao" para os módulos da API
+api/index.js            função da Vercel (POST /api)
+server/http.js          recebe POST /api, lê e renova o cookie da sessão
+server/handler.js       despacha as chamadas "modulo.acao" numa transação; bloqueio por senha errada
+server/session.js       sessão em cookie assinado (7 dias, renovada a cada uso)
 server/dev.js           servidor local de desenvolvimento (POST /api)
 server/db.js            banco Postgres (Supabase ou PGlite) e migrações (adicione novas entradas em MIGRATIONS;
                         depois da primeira publicação, nunca altere as antigas)
@@ -191,7 +194,7 @@ src/api.js              chamada à API pelas telas
 src/pages/              telas React (PDV, Vendas, Compras, Estoque, Financeiro, Relatórios, Configurações...)
 src/components/ui.jsx   componentes compartilhados
 src/lib/print.js        cupom, recibo, carnê, etiquetas
-tests/roteiro.test.js   teste de ponta a ponta da API
+tests/                  roteiro da loja (todas as chamadas da API) e sessão/login
 ```
 
 ## Roteiro de teste sugerido

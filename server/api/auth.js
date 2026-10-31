@@ -3,7 +3,26 @@ const { fail, requireAdmin, requireUser, hashPassword, verifyPassword, allSettin
 
 const publicUser = (u) => u && ({ id: u.id, name: u.name, username: u.username, role: u.role });
 
+// Tentativas de senha errada nos últimos 15 minutos: bloqueia com 5 por usuário ou 20 pelo mesmo IP
+async function loginBlocked(username, ip) {
+  const r = await dbm.get().prepare(`SELECT COUNT(*) FILTER (WHERE username = ?) u, COUNT(*) FILTER (WHERE ip = ?) i
+    FROM login_attempts WHERE created_at > now() - interval '15 minutes'`).get(username, ip || null);
+  return r.u >= 5 || r.i >= 20;
+}
+async function recordLoginFailure(username, ip) {
+  const db = dbm.get();
+  await db.prepare("DELETE FROM login_attempts WHERE created_at < now() - interval '1 day'").run();
+  await db.prepare('INSERT INTO login_attempts (username, ip) VALUES (?, ?)').run(username, ip || null);
+}
+async function clearLoginFailures(username) {
+  await dbm.get().prepare('DELETE FROM login_attempts WHERE username = ?').run(username);
+}
+
 module.exports = {
+  loginBlocked,
+  recordLoginFailure,
+  clearLoginFailures,
+
   'auth.status': async (_, ctx) => {
     const count = (await dbm.get().prepare('SELECT COUNT(*) c FROM users').get()).c;
     return { needsSetup: count === 0, user: publicUser(ctx.user), storeName: (await allSettings()).store_name };
@@ -44,6 +63,8 @@ module.exports = {
     if (!verifyPassword(current, u.password_hash)) fail('Senha atual incorreta.');
     if (String(password).length < 4) fail('A nova senha deve ter pelo menos 4 caracteres.');
     await dbm.get().prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hashPassword(password), u.id);
+    // Atualiza a sessão: as outras sessões abertas deste usuário deixam de valer
+    ctx.user = await dbm.get().prepare('SELECT * FROM users WHERE id = ?').get(u.id);
     return true;
   },
 
@@ -62,6 +83,7 @@ module.exports = {
       await db.prepare('UPDATE users SET name = ?, username = ?, role = ?, active = ? WHERE id = ?')
         .run(u.name.trim(), u.username.trim(), role, u.active ? 1 : 0, u.id);
       if (u.password) await db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hashPassword(u.password), u.id);
+      if (u.id === ctx.user.id) ctx.user = await db.prepare('SELECT * FROM users WHERE id = ?').get(u.id);
       return u.id;
     }
     if (!u.password) fail('Informe uma senha para o novo usuário.');
