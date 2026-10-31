@@ -94,7 +94,12 @@ Decisões:
   pausar por inatividade), mais os botões "Baixar backup" e "Restaurar backup".
 - **Impressão** pelo navegador. Hoje o Samuel não usa impressora térmica, mas vai usar: manter os modelos de
   80/58 mm e documentar como o Chrome imprime direto sem perguntar.
-- Repositório: privado no GitHub. No fim, transferir para a conta do Samuel ou adicioná-lo como colaborador.
+- Repositório do Alexsandre: **público**, só com o código. O Samuel clona e cria a própria cópia
+  **privada** (o ramo `backups` dela guarda dados de clientes). O workflow de backup não faz nada sem o
+  secret e recusa gravar em repositório público.
+- O Samuel não programa e usa o Claude (app + extensão do VS Code): `COMECE-AQUI.md` traz os textos para
+  colar no Claude, e o `CLAUDE.md` orienta o Claude dele (português simples, um passo por vez, senhas
+  coladas por ele direto nos sites).
 - Fora do escopo por enquanto: catálogo de produtos, fotos e as lacunas listadas acima.
 
 Como fica:
@@ -110,7 +115,7 @@ só que assíncrona. Assim os módulos da API mudam pouco: ganham `await` e ajus
 
 Fases (marcar ao concluir, com commit ao fim de cada uma):
 
-- [ ] 0. Repositório privado no GitHub e troca da origem (hoje aponta para `pixel444-dev/LojaUp`)
+- [ ] 0. Repositório público no GitHub do Alexsandre e troca da origem (hoje aponta para `pixel444-dev/LojaUp`)
 - [x] 1. Tirar o Electron: entrada `api/` para a Vercel e servidor local para desenvolvimento
 - [x] 2. Camada de banco compatível, esquema Postgres, migração automática, RLS ligado em todas as tabelas
 - [x] 3. Portar os módulos da API para Postgres e fixar o fuso `America/Sao_Paulo`
@@ -119,15 +124,16 @@ Fases (marcar ao concluir, com commit ao fim de cada uma):
 - [x] 6. Backup: GitHub Actions diário + baixar/restaurar em Configurações
 - [x] 7. Teste automático do roteiro (custo com frete, vendas, estoque, caixa, crediário, trocas)
 - [x] 8. Layout para celular (menu, tabelas, formulários; PDV, Produtos, Estoque, Painel, Clientes)
-- [ ] 9. `PUBLICAR.md` (feito), publicação de teste em contas próprias e entrega ao Samuel
+- [ ] 9. `COMECE-AQUI.md`, `PUBLICAR.md` e `CLAUDE.md` (feitos), publicação de teste e entrega ao Samuel
 
 Pendente de quem tem as contas (não dá para fazer daqui):
 
-1. Criar o repositório **privado** no GitHub, trocar a origem (`git remote set-url origin <novo>`) e dar
-   push no `main`.
-2. Publicação de teste seguindo o `PUBLICAR.md` em contas próprias (Supabase + Vercel), rodar o backup
-   manual na aba Actions, conferir login, uma venda e o backup no celular. Depois apagar o projeto de teste.
-3. Transferir o repositório para o Samuel (Settings › Transfer) e ele segue o `PUBLICAR.md`.
+1. Criar o repositório público no GitHub, trocar a origem (`git remote set-url origin <novo>`), dar push no
+   `main` e trocar `ENDERECO_DO_REPOSITORIO` no `COMECE-AQUI.md` pelo endereço real.
+2. Recomendado: publicação de teste seguindo o `COMECE-AQUI.md` em contas próprias (cópia privada,
+   Supabase, Vercel), rodar o backup manual na aba Actions, conferir login, uma venda e o backup no
+   celular. Depois apagar o projeto de teste.
+3. Mandar ao Samuel o link do `COMECE-AQUI.md`.
 
 ## Alterações já feitas
 

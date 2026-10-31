@@ -19,6 +19,9 @@
   Roda de graça na Vercel com o banco de dados no Supabase.
 </p>
 
+> **Vai usar o sistema na sua loja?** Comece pelo [**COMECE-AQUI.md**](COMECE-AQUI.md): o Claude prepara
+> tudo com você, mesmo sem saber programar.
+
 <p align="center">
   <a href="#-módulos">Módulos</a> ·
   <a href="#-publicar">Publicar</a> ·
@@ -50,8 +53,9 @@
 
 ## 🚀 Publicar
 
-O passo a passo para colocar o sistema no ar (GitHub, Supabase e Vercel, todos no plano grátis) está em
-[**PUBLICAR.md**](PUBLICAR.md).
+1. [**COMECE-AQUI.md**](COMECE-AQUI.md): baixa o projeto e cria a sua cópia privada no GitHub, com a ajuda
+   do Claude.
+2. [**PUBLICAR.md**](PUBLICAR.md): Supabase, Vercel e backup diário, todos no plano grátis.
 
 ---
 

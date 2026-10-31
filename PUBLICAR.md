@@ -8,19 +8,22 @@ Este guia publica o sistema na internet, de graça, para usar no celular e no co
 | **Supabase** | Banco de dados (onde ficam vendas, produtos, clientes...) | Grátis |
 | **Vercel** | Deixa o sistema acessível num endereço da internet | Grátis (Hobby) |
 
-Leva uns 30 minutos. Faça na ordem.
+Leva uns 30 minutos. Faça na ordem. Se você não programa, comece pelo [COMECE-AQUI.md](COMECE-AQUI.md): o
+Claude faz as partes técnicas com você.
 
 > **Guarde bem a senha do banco e o endereço de conexão.** Quem tiver esse endereço tem acesso a todos os
 > dados da loja. Nunca mande por WhatsApp nem coloque em arquivos do projeto.
 
 ---
 
-## 1. GitHub: o repositório
+## 1. GitHub: a sua cópia privada
 
-O repositório com o código precisa estar na sua conta do GitHub e ser **privado** (os backups ficam nele).
+O sistema é publicado a partir de uma cópia do código **na sua conta do GitHub**, e essa cópia precisa ser
+**privada**: o backup diário grava nela os dados da loja (clientes, vendas). Num repositório público o
+backup se recusa a rodar.
 
-1. Entre em https://github.com e confira se o repositório do LojaUp aparece na sua conta.
-2. Abra o repositório › **Settings** › em *Danger Zone*, confira que a visibilidade é **Private**.
+A cópia é criada na Parte 1 do [COMECE-AQUI.md](COMECE-AQUI.md). Para conferir: abra o repositório no
+GitHub; ao lado do nome deve aparecer **Private**.
 
 ## 2. Supabase: o banco de dados
 
