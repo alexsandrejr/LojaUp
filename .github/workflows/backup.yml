@@ -1,0 +1,46 @@
+# Backup diário dos dados do Supabase, guardado no ramo "backups" deste repositório (backup/lojaup-backup.json).
+# Precisa do secret DATABASE_URL (Settings › Secrets and variables › Actions). Veja PUBLICAR.md.
+name: Backup diário
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # 03:00 no horário de Brasília
+  workflow_dispatch: # botão "Run workflow" na aba Actions
+
+permissions:
+  contents: write
+
+concurrency: backup
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --omit=dev
+
+      - name: Exporta os dados
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node scripts/backup.js "$RUNNER_TEMP/lojaup-backup.json"
+
+      - name: Guarda no ramo backups
+        run: |
+          git config user.name "Backup LojaUp"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git fetch origin backups; then
+            git switch -c backups FETCH_HEAD
+          else
+            git switch --orphan backups
+          fi
+          mkdir -p backup
+          cp "$RUNNER_TEMP/lojaup-backup.json" backup/lojaup-backup.json
+          git add backup/lojaup-backup.json
+          git commit -m "Backup $(TZ=America/Sao_Paulo date +'%d/%m/%Y %H:%M')" || echo "Nada mudou desde o último backup"
+          git push origin backups

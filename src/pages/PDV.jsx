@@ -254,7 +254,7 @@ function SaleDone({ sale, settings, onNew }) {
   return (
     <Modal title={`Venda #${sale.id} concluída`} size="sm" onClose={onNew}
       footer={<>
-        {sale.installments.length > 0 && <button className="btn" onClick={() => printHtml(carne(sale, settings), settings, { thermal: false, dialog: true })}>Imprimir carnê</button>}
+        {sale.installments.length > 0 && <button className="btn" onClick={() => printHtml(carne(sale, settings), settings, { thermal: false })}>Imprimir carnê</button>}
         <button className="btn" onClick={print}><Printer size={16} />Cupom <span className="kbd">Enter</span></button>
         <button className="btn btn-primary" onClick={onNew}>Nova venda <span className="kbd">Esc</span></button>
       </>}>

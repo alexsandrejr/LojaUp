@@ -92,7 +92,7 @@ export function SaleDetailModal({ id, onClose, onChanged }) {
       footer={<>
         {isAdmin && sale.status === 'concluida' && !sale.returns.length && <button className="btn btn-ghost text-danger" onClick={() => setCanceling(true)}><Ban size={16} />Cancelar venda</button>}
         <div className="spacer" />
-        {sale.installments.length > 0 && <button className="btn" onClick={() => print(carne(sale, settings), { thermal: false, dialog: true })}>Carnê</button>}
+        {sale.installments.length > 0 && <button className="btn" onClick={() => print(carne(sale, settings), { thermal: false })}>Carnê</button>}
         <button className="btn" onClick={() => print(saleReceipt(sale, settings))}><Printer size={16} />Reimprimir cupom</button>
         {canReturn && <button className="btn btn-primary" onClick={() => setReturning(true)}><RotateCcw size={16} />Troca / devolução</button>}
       </>}>

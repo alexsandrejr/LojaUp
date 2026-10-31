@@ -189,11 +189,44 @@ export function labelsDoc(items, settings, { mode = 'a4', width = 50, height = 3
   </style></head><body><div class="sheet">${all.map(label).join('')}</div></body></html>`;
 }
 
-// Envia para impressão pela janela do navegador
-export async function printHtml(html) {
-  const w = window.open('', '_blank', 'width=420,height=700');
-  if (!w) return;
-  w.document.write(html);
-  w.document.close();
-  setTimeout(() => w.print(), 300);
+// Imprime um HTML pela janela de impressão do navegador, num quadro oculto da própria página.
+// thermal = true ajusta o tamanho da página à bobina (80 ou 58 mm) e à altura do conteúdo.
+export function printHtml(html, settings = {}, { thermal = true } = {}) {
+  return new Promise((resolve, reject) => {
+    const frame = document.createElement('iframe');
+    frame.setAttribute('aria-hidden', 'true');
+    frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+    document.body.appendChild(frame);
+    const doc = frame.contentDocument;
+    doc.open();
+    doc.write(html);
+    doc.close();
+    const go = () => {
+      try {
+        if (thermal) {
+          const widthMm = Number(settings.printer_width) || 80;
+          const heightMm = Math.max(40, Math.ceil((doc.documentElement.scrollHeight * 25.4) / 96) + 8);
+          const style = doc.createElement('style');
+          style.textContent = `@page { size: ${widthMm}mm ${heightMm}mm; margin: 0; }`;
+          doc.head.appendChild(style);
+        }
+        const win = frame.contentWindow;
+        // Remove o quadro depois que a janela de impressão fecha
+        win.addEventListener('afterprint', () => setTimeout(() => frame.remove(), 500));
+        setTimeout(() => frame.remove(), 60000);
+        win.focus();
+        win.print();
+        resolve();
+      } catch (e) {
+        frame.remove();
+        reject(new Error('Não foi possível abrir a impressão: ' + e.message));
+      }
+    };
+    // Espera imagens (códigos de barras) carregarem
+    let started = false;
+    const start = () => { if (!started) { started = true; setTimeout(go, 150); } };
+    frame.addEventListener('load', start, { once: true });
+    if (doc.readyState === 'complete') start();
+    setTimeout(start, 1000);
+  });
 }

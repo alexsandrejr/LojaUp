@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Save, Printer, Cloud, Usb, FolderOpen, Trash2, HardDrive, Upload, Plus, CircleCheck, TriangleAlert, RefreshCw } from 'lucide-react';
+import { Save, Printer, Cloud, Download, Upload, Plus, CircleCheck, TriangleAlert } from 'lucide-react';
 import { api } from '../api';
 import { useApp } from '../App';
 import { Modal, Field, useLoad, useAction, useConfirm, PageHeader, Loading, Tabs, Empty, useToast } from '../components/ui';
-import { dateTime, bytes, birthdayMessage, DEFAULT_BIRTHDAY_MESSAGE } from '../lib/format';
+import { dateTime, birthdayMessage, DEFAULT_BIRTHDAY_MESSAGE } from '../lib/format';
 import { printHtml, saleReceipt } from '../lib/print';
 
 function useSettingsForm() {
@@ -39,168 +39,164 @@ function Loja() {
 
 function Impressora() {
   const { s, set, save, busy } = useSettingsForm();
-  const { data: printers, reload } = useLoad('print.printers', {}, []);
   const toast = useToast();
+  const keys = ['printer_width', 'print_auto'];
   async function test() {
-    await save(['printer_name', 'printer_width', 'print_auto', 'print_silent']);
+    await save(keys);
     const fake = {
       id: 123, created_at: new Date().toISOString().replace('T', ' ').slice(0, 19), user_name: 'Teste', customer_name: 'Cliente Teste', status: 'concluida',
-      items: [{ description: 'Camiseta Básica Preta M', quantity: 2, unit_price: 49.9, discount: 0 }, { description: 'Calça Jeans Skinny Azul 40', quantity: 1, unit_price: 129.9, discount: 10 }],
-      subtotal: 229.7, discount: 10, total: 219.7, payments: [{ method: 'dinheiro', amount: 219.7 }], change_amount: 30.3, installments: [],
+      items: [{ description: 'Relógio S11 Pro Prata', quantity: 1, unit_price: 189.9, discount: 0 }, { description: 'Pulseira Silicone Preta', quantity: 2, unit_price: 29.9, discount: 5 }],
+      subtotal: 249.7, discount: 5, total: 244.7, payments: [{ method: 'dinheiro', amount: 244.7 }], change_amount: 5.3, installments: [],
     };
-    try { await printHtml(saleReceipt(fake, s), s); toast.success('Enviado para a impressora.'); } catch (e) { toast.error(e.message); }
+    try { await printHtml(saleReceipt(fake, s), s); } catch (e) { toast.error(e.message); }
   }
   return (
     <div className="card card-body" style={{ maxWidth: 760 }}>
       <div className="alert alert-info mb small">
         <Printer size={18} />
-        <div>Instale o driver Windows da impressora térmica (Elgin, Bematech, Epson, Daruma, Tanca, Knup…) e selecione-a abaixo. Com “imprimir sem perguntar” ativado o cupom sai direto, sem janela de impressão.</div>
+        <div>O cupom abre a janela de impressão do navegador. Escolha nela a impressora térmica: o navegador lembra a última usada. Instale antes o driver Windows da impressora (Elgin, Bematech, Epson, Daruma, Tanca, Knup…).</div>
       </div>
       <div className="form-grid">
-        <Field label="Impressora de cupom" className="c-8">
-          <div className="row">
-            <select className="select" value={s.printer_name} onChange={set('printer_name')}>
-              <option value="">Perguntar sempre (janela de impressão)</option>
-              {(printers || []).map((p) => <option key={p.name} value={p.name}>{p.displayName}{p.isDefault ? ' (padrão)' : ''}</option>)}
-            </select>
-            <button className="btn btn-icon" title="Atualizar lista" onClick={reload}><RefreshCw size={15} /></button>
-          </div>
-        </Field>
         <Field label="Largura da bobina" className="c-4">
           <select className="select" value={s.printer_width} onChange={set('printer_width')}><option value="80">80 mm</option><option value="58">58 mm</option></select>
         </Field>
-        <label className="checkbox c-12"><input type="checkbox" checked={s.print_silent === '1'} onChange={set('print_silent')} />Imprimir sem perguntar (direto na impressora selecionada)</label>
         <label className="checkbox c-12"><input type="checkbox" checked={s.print_auto === '1'} onChange={set('print_auto')} />Imprimir o cupom automaticamente ao concluir cada venda</label>
+      </div>
+      <div className="card card-body mt small" style={{ background: 'var(--surface-2)' }}>
+        <div className="strong" style={{ marginBottom: 6 }}>Imprimir direto, sem a janela de impressão (computador da loja)</div>
+        <ol style={{ margin: 0, paddingLeft: 18, lineHeight: 1.6 }}>
+          <li>Defina a impressora térmica como <b>impressora padrão</b> do Windows.</li>
+          <li>Crie um atalho do Google Chrome na área de trabalho.</li>
+          <li>Clique com o botão direito no atalho › Propriedades. No campo <b>Destino</b>, depois de <span className="mono">chrome.exe"</span>, acrescente um espaço e <span className="mono">--kiosk-printing</span>.</li>
+          <li>Feche todas as janelas do Chrome e abra o LojaUp por esse atalho. A partir daí o cupom sai direto na impressora padrão.</li>
+        </ol>
       </div>
       <div className="row end mt">
         <button className="btn" onClick={test}><Printer size={16} />Imprimir teste</button>
-        <button className="btn btn-primary" disabled={busy} onClick={() => save(['printer_name', 'printer_width', 'print_auto', 'print_silent'])}><Save size={16} />Salvar</button>
+        <button className="btn btn-primary" disabled={busy} onClick={() => save(keys)}><Save size={16} />Salvar</button>
       </div>
     </div>
   );
 }
 
+// Envia o backup ao servidor em partes, para respeitar o limite de tamanho de cada requisição
+const RESTORE_CHUNK = 1000;
+
 function Backup() {
-  const { s, set, save, setS } = useSettingsForm();
   const { data: info, reload } = useLoad('backup.info', {}, []);
-  const { data: files, reload: reloadFiles } = useLoad('backup.list', {}, []);
-  const [results, setResults] = useState(null);
-  const [run, busy] = useAction();
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState('');
+  const fileRef = useRef(null);
   const confirm = useConfirm();
   const toast = useToast();
   if (!info) return <Loading />;
-  const dests = JSON.parse(s.backup_folders || '[]');
 
-  async function saveDests(list) {
-    const next = { ...s, backup_folders: JSON.stringify(list) };
-    setS(next);
-    await api('settings.save', { backup_folders: list });
-    reload();
+  async function download() {
+    setBusy(true);
+    try {
+      const fresh = await api('backup.info');
+      const file = { ...fresh.header, tables: {} };
+      for (const [i, table] of fresh.tables.entries()) {
+        setProgress(`Lendo os dados… ${Math.round((i / fresh.tables.length) * 100)}%`);
+        file.tables[table] = [];
+        for (let offset = 0; ;) {
+          const page = await api('backup.export', { table, offset });
+          file.tables[table].push(...page.rows);
+          offset += page.rows.length;
+          if (page.done) break;
+        }
+      }
+      const name = `LojaUp-backup-${file.created_at.replace(' ', '_').replace(/:/g, '').slice(0, 15)}.json`;
+      const url = URL.createObjectURL(new Blob([JSON.stringify(file)], { type: 'application/json' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      await api('backup.downloaded');
+      toast.success(`Backup baixado: ${name}`);
+      reload();
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setBusy(false);
+      setProgress('');
+    }
   }
-  const addFolder = (d) => { if (!dests.some((x) => x.type === d.type && x.path === d.path)) saveDests([...dests, d]); };
 
-  async function runNow() {
-    const r = await run(() => api('backup.run'));
-    setResults(r);
-    reload(); reloadFiles();
-    if (r.every((x) => x.ok)) toast.success('Backup concluído!');
-  }
-  async function toDrive(drive) {
-    const file = await run(() => api('backup.runTo', { folder: `${drive.drive}\\Backup LojaUp` }), `Backup salvo no pendrive ${drive.label}`);
-    setResults([{ destination: `Pendrive ${drive.label}`, ok: true, file }]);
-    reload();
-  }
-  async function restore(file) {
-    if (!file) return;
+  async function restore(f) {
+    if (!f) return;
+    let data;
+    try { data = JSON.parse(await f.text()); } catch (e) { data = null; }
+    if (!data || data.format !== 'lojaup-backup' || !data.tables) { toast.error('Este arquivo não é um backup do LojaUp.'); return; }
     const ok = await confirm({
       title: 'Restaurar backup', danger: true, confirmText: 'Restaurar',
-      message: `Os dados atuais serão SUBSTITUÍDOS pelo backup:\n${file}\n\nUma cópia de segurança dos dados atuais será guardada antes. Depois será preciso entrar novamente. Continuar?`,
+      message: `Os dados atuais serão SUBSTITUÍDOS pelos do backup de ${dateTime(data.created_at)}.\n\nSe quiser guardar os dados atuais, baixe um backup antes. Depois da restauração será preciso entrar novamente. Continuar?`,
     });
     if (!ok) return;
-    await run(() => api('backup.restore', { file }), 'Backup restaurado!');
-    setTimeout(() => window.location.reload(), 600);
+    setBusy(true);
+    try {
+      await api('backup.restoreStage', { reset: true, schema_version: data.schema_version });
+      const tables = Object.entries(data.tables);
+      for (const [i, [table, rows]] of tables.entries()) {
+        setProgress(`Enviando os dados… ${Math.round((i / tables.length) * 100)}%`);
+        for (let k = 0; k < rows.length; k += RESTORE_CHUNK) await api('backup.restoreStage', { table, rows: rows.slice(k, k + RESTORE_CHUNK) });
+      }
+      setProgress('Aplicando…');
+      await api('backup.restoreCommit');
+      toast.success('Backup restaurado! Entre novamente.');
+      setTimeout(() => window.location.reload(), 800);
+    } catch (e) {
+      toast.error(e.message);
+      setBusy(false);
+      setProgress('');
+    }
   }
 
+  const days = info.lastBackup ? Math.floor((Date.now() - new Date(info.lastBackup.replace(' ', 'T')).getTime()) / 86400000) : null;
   return (
     <div className="grid grid-2">
       <div className="col" style={{ gap: 16 }}>
         <div className="card">
-          <div className="card-header"><HardDrive size={17} /><h3>Destinos do backup</h3></div>
+          <div className="card-header"><Cloud size={17} /><h3>Backup automático</h3></div>
           <div className="card-body col">
-            {!dests.length && <div className="alert alert-danger"><TriangleAlert size={18} />Nenhum destino configurado. Se o computador estragar, os dados podem ser perdidos.</div>}
-            {dests.map((d, i) => (
-              <div key={i} className="row card card-body" style={{ padding: 10 }}>
-                {d.type === 'pendrive' ? <Usb size={18} /> : d.label === 'OneDrive' ? <Cloud size={18} /> : <FolderOpen size={18} />}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="strong">{d.type === 'pendrive' ? 'Pendrive (qualquer um conectado)' : d.label}</div>
-                  <div className="small muted" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.type === 'pendrive' ? 'Salva na pasta "Backup LojaUp" de cada pendrive conectado no momento do backup' : d.path}</div>
-                </div>
-                <button className="btn btn-ghost btn-icon" onClick={() => saveDests(dests.filter((_, j) => j !== i))}><Trash2 size={15} /></button>
-              </div>
-            ))}
-            <div className="row wrap">
-              {info.oneDrive.map((p) => (
-                <button key={p} className="btn" onClick={() => addFolder({ type: 'folder', path: `${p}\\Backup LojaUp`, label: 'OneDrive' })}><Cloud size={16} />Usar OneDrive{info.oneDrive.length > 1 ? ` (${p.split('\\').pop()})` : ''}</button>
-              ))}
-              {!dests.some((d) => d.type === 'pendrive') && <button className="btn" onClick={() => addFolder({ type: 'pendrive' })}><Usb size={16} />Pendrive</button>}
-            </div>
-            {!info.oneDrive.length && <div className="small muted">OneDrive não encontrado neste computador. Instale e entre com a conta Microsoft para ter backup na nuvem.</div>}
+            {days == null || days > 2
+              ? <div className="alert alert-danger small"><TriangleAlert size={16} /><div>{days == null ? 'Nenhum backup feito ainda.' : `Último backup há ${days} dias.`} O backup automático roda todo dia pelo GitHub. Se ele parou, confira a aba Actions do repositório. Enquanto isso, baixe uma cópia ao lado.</div></div>
+              : <div className="alert alert-success small"><CircleCheck size={16} /><div>Último backup: <b>{dateTime(info.lastBackup)}</b></div></div>}
+            <div className="small muted">Todo dia, de madrugada, uma cópia completa dos dados é guardada no repositório privado do GitHub (pasta <span className="mono">backup</span>, ramo <span className="mono">backups</span>). O histórico do arquivo guarda as cópias de todos os dias.</div>
           </div>
-        </div>
-
-        <div className="card">
-          <div className="card-header"><h3>Backup automático</h3></div>
-          <div className="card-body form-grid">
-            <label className="checkbox c-12"><input type="checkbox" checked={s.backup_auto_on_close === '1'} onChange={set('backup_auto_on_close')} />Fazer backup sempre que o sistema for fechado</label>
-            <Field label="Também a cada (horas)" className="c-6" hint="0 = desativado"><input type="number" className="input" value={s.backup_interval_hours} onChange={set('backup_interval_hours')} /></Field>
-            <Field label="Manter os últimos" className="c-6" hint="backups em cada destino"><input type="number" className="input" value={s.backup_keep} onChange={set('backup_keep')} /></Field>
-            <div className="c-12 row end"><button className="btn btn-primary" onClick={() => save(['backup_auto_on_close', 'backup_interval_hours', 'backup_keep'])}><Save size={16} />Salvar</button></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="col" style={{ gap: 16 }}>
-        <div className="card">
-          <div className="card-header"><h3>Fazer backup agora</h3></div>
-          <div className="card-body col">
-            <div className="small muted">Último backup: <b>{info.lastBackup ? dateTime(info.lastBackup) : 'nunca'}</b> · Banco de dados: {bytes(info.dbSize)}</div>
-            <button className="btn btn-primary btn-lg" disabled={busy} onClick={runNow}><Save size={18} />{busy ? 'Copiando…' : 'Fazer backup em todos os destinos'}</button>
-            {info.drives.length > 0 && (
-              <div className="row wrap">{info.drives.map((d) => <button key={d.drive} className="btn" disabled={busy} onClick={() => toDrive(d)}><Usb size={16} />Só no pendrive {d.label} ({d.drive})</button>)}</div>
-            )}
-            {results && results.map((r, i) => (
-              <div key={i} className={`alert ${r.ok ? 'alert-success' : 'alert-danger'} small`}>
-                {r.ok ? <CircleCheck size={16} /> : <TriangleAlert size={16} />}
-                <div><b>{r.destination}</b>: {r.ok ? r.file : r.error}</div>
-              </div>
-            ))}
-            <div className="small muted">Local do banco: <span className="mono">{info.dbPath}</span></div>
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="card-header"><Upload size={17} /><h3>Restaurar backup</h3></div>
-          {!files?.length ? <Empty>Nenhum backup encontrado nas pastas configuradas.</Empty> : (
-            <div className="table-wrap" style={{ maxHeight: 260 }}>
-              <table className="table table-compact">
-                <tbody>{files.map((f) => (
-                  <tr key={f.file}><td className="small">{dateTime(f.date.replace('T', ' '))}<div className="muted" style={{ fontSize: 11 }}>{f.folder}</div></td><td className="num small">{bytes(f.size)}</td>
-                    <td className="actions-cell"><button className="btn btn-sm" onClick={() => restore(f.file)}>Restaurar</button></td></tr>
-                ))}</tbody>
-              </table>
-            </div>
-          )}
         </div>
 
         <div className="card">
           <div className="card-header"><h3>Histórico</h3></div>
           {!info.log.length ? <Empty>Nenhum backup registrado.</Empty> : (
-            <div className="table-wrap" style={{ maxHeight: 220 }}>
+            <div className="table-wrap" style={{ maxHeight: 260 }}>
               <table className="table table-compact"><tbody>{info.log.map((l) => (
                 <tr key={l.id}><td className="small nowrap">{dateTime(l.created_at)}</td><td className="small">{l.destination}</td><td>{l.status === 'ok' ? <span className="badge badge-success">ok</span> : <span className="badge badge-danger" title={l.message}>erro</span>}</td><td className="small muted">{l.message}</td></tr>
               ))}</tbody></table>
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="col" style={{ gap: 16 }}>
+        <div className="card">
+          <div className="card-header"><Download size={17} /><h3>Baixar backup</h3></div>
+          <div className="card-body col">
+            <div className="small muted">Baixa um arquivo com todos os dados da loja. Guarde-o no computador, no OneDrive ou num pendrive.</div>
+            <button className="btn btn-primary btn-lg" disabled={busy} onClick={download}><Download size={18} />{busy && progress ? progress : 'Baixar backup agora'}</button>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-header"><Upload size={17} /><h3>Restaurar backup</h3></div>
+          <div className="card-body col">
+            <div className="small muted">Substitui todos os dados pelos de um arquivo de backup (baixado aqui ou do GitHub).</div>
+            <input ref={fileRef} type="file" accept=".json,application/json" style={{ display: 'none' }} onChange={(e) => { restore(e.target.files[0]); e.target.value = ''; }} />
+            <button className="btn" disabled={busy} onClick={() => fileRef.current.click()}><Upload size={16} />{busy && progress ? progress : 'Escolher arquivo…'}</button>
+          </div>
         </div>
       </div>
     </div>

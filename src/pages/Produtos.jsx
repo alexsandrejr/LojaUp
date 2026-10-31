@@ -140,7 +140,7 @@ export function LabelsModal({ products, onClose }) {
   const total = items.reduce((a, i) => a + (Number(i.copies) || 0), 0);
   return (
     <Modal title="Imprimir etiquetas" onClose={onClose} size="lg"
-      footer={<><button className="btn" onClick={onClose}>Fechar</button><button className="btn btn-primary" disabled={!total} onClick={() => printHtml(labelsDoc(items.filter((i) => i.copies > 0), settings, { mode, ...size }), settings, { thermal: false, dialog: true })}><Printer size={16} />Imprimir {total} etiqueta(s)</button></>}>
+      footer={<><button className="btn" onClick={onClose}>Fechar</button><button className="btn btn-primary" disabled={!total} onClick={() => printHtml(labelsDoc(items.filter((i) => i.copies > 0), settings, { mode, ...size }), settings, { thermal: false })}><Printer size={16} />Imprimir {total} etiqueta(s)</button></>}>
       <div className="row mb wrap">
         <Segmented value={mode} onChange={setMode} options={[{ value: 'a4', label: 'Folha A4 adesiva' }, { value: 'label', label: 'Impressora de etiquetas' }]} />
         <Field label="Largura (mm)"><input type="number" className="input" style={{ width: 90 }} value={size.width} onChange={(e) => setSize({ ...size, width: Number(e.target.value) })} /></Field>

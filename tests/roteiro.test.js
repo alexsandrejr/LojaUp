@@ -6,6 +6,8 @@ const assert = require('node:assert/strict');
 const dbm = require('../server/db');
 const { call, handlers } = require('../server/handler');
 const { localDate, addDays } = require('../server/api/util');
+const { dumpAll } = require('../server/api/backup');
+const { serialize } = require('../scripts/backup');
 
 const called = new Set();
 const admin = { user: null };
@@ -299,6 +301,10 @@ test('backup e restauração', async () => {
   }
   await ok(admin, 'backup.downloaded');
   const salesBefore = file.tables.sales.length;
+  // O arquivo do backup automático (scripts/backup.js) tem o mesmo conteúdo
+  const auto = JSON.parse(serialize(await dbm.request(() => dumpAll())));
+  assert.deepEqual(auto.tables.sales, file.tables.sales);
+  assert.equal(auto.format, 'lojaup-backup');
   // Estraga os dados e restaura
   await ok(admin, 'customers.save', { name: 'Cliente depois do backup' });
   await err(admin, 'backup.restoreStage', { reset: true, schema_version: 999 });

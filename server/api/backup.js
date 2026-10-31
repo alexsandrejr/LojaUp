@@ -76,9 +76,7 @@ module.exports = {
     if (!table) return true;
     if (!dbm.TABLES.includes(table)) fail(`Tabela desconhecida no backup: ${table}`);
     if (!Array.isArray(rows)) fail('Arquivo de backup inválido.');
-    for (const row of rows) {
-      await db.prepare('INSERT INTO backup_staging (tbl, data) VALUES (?, ?::jsonb)').run(table, JSON.stringify(row));
-    }
+    await db.prepare('INSERT INTO backup_staging (tbl, data) SELECT ?, jsonb_array_elements(?::jsonb) RETURNING id').run(table, JSON.stringify(rows));
     return true;
   },
 

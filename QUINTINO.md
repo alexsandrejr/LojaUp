@@ -114,8 +114,8 @@ Fases (marcar ao concluir, com commit ao fim de cada uma):
 - [x] 2. Camada de banco compatível, esquema Postgres, `npm run migrate`, RLS ligado em todas as tabelas
 - [x] 3. Portar os módulos da API para Postgres e fixar o fuso `America/Sao_Paulo`
 - [x] 4. Login com sessão em cookie, expiração e bloqueio por tentativas
-- [ ] 5. Impressão pelo navegador
-- [ ] 6. Backup: GitHub Actions diário + baixar/restaurar em Configurações
+- [x] 5. Impressão pelo navegador
+- [x] 6. Backup: GitHub Actions diário + baixar/restaurar em Configurações
 - [x] 7. Teste automático do roteiro (custo com frete, vendas, estoque, caixa, crediário, trocas)
 - [ ] 8. Layout para celular (menu, tabelas, formulários; PDV, Produtos, Estoque, Painel, Clientes)
 - [ ] 9. `PUBLICAR.md`, publicação de teste e entrega ao Samuel
