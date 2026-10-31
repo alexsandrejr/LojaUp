@@ -53,15 +53,17 @@ Etapas:
    Se o comando code não existir, me avise: o VS Code precisa estar instalado.
 
 2. Pasta e cópia do projeto. Crie a pasta %USERPROFILE%\Projetos, se ela não existir, e clone nela o
-   repositório ENDERECO_DO_REPOSITORIO na pasta LojaUp. Se a pasta LojaUp já existir, me pergunte antes
+   repositório https://github.com/alexsandrejr/LojaUp na pasta LojaUp. Se a pasta LojaUp já existir, me pergunte antes
    de mexer nela. Dentro de LojaUp, rode git remote rename origin upstream: é desse repositório do
    Alexsandre que virão as atualizações.
 
 3. Login no GitHub. Rode gh auth status. Se eu não estiver logado, rode em segundo plano
-   gh auth login --hostname github.com --git-protocol https --web
+   gh auth login --hostname github.com --git-protocol https --web --scopes workflow
    leia a saída e me mostre o código de 8 caracteres e o endereço https://github.com/login/device. Eu abro
-   o endereço, digito o código e autorizo. Espere o comando terminar e confirme com gh auth status. Se esse
-   comando não funcionar aí, me peça para abrir o Terminal do Windows e rodar gh auth login eu mesmo, me
+   o endereço, digito o código e autorizo. Espere o comando terminar e confirme com gh auth status. Se eu já
+   estiver logado mas a lista "Token scopes" não tiver "workflow", rode gh auth refresh -h github.com
+   -s workflow do mesmo jeito (sem essa permissão o GitHub recusa o envio do backup diário). Se esses
+   comandos não funcionarem aí, me peça para abrir o Terminal do Windows e rodar gh auth login eu mesmo, me
    dizendo o que escolher em cada pergunta. Depois do login, rode gh auth setup-git.
 
 4. Meu repositório privado. Dentro de LojaUp, rode:

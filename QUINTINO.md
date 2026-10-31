@@ -115,7 +115,8 @@ só que assíncrona. Assim os módulos da API mudam pouco: ganham `await` e ajus
 
 Fases (marcar ao concluir, com commit ao fim de cada uma):
 
-- [ ] 0. Repositório público no GitHub do Alexsandre e troca da origem (hoje aponta para `pixel444-dev/LojaUp`)
+- [x] 0. Repositório público https://github.com/alexsandrejr/LojaUp (remoto `origin`; o original do
+  pixel444-dev ficou como remoto `pixel444`)
 - [x] 1. Tirar o Electron: entrada `api/` para a Vercel e servidor local para desenvolvimento
 - [x] 2. Camada de banco compatível, esquema Postgres, migração automática, RLS ligado em todas as tabelas
 - [x] 3. Portar os módulos da API para Postgres e fixar o fuso `America/Sao_Paulo`
@@ -128,12 +129,11 @@ Fases (marcar ao concluir, com commit ao fim de cada uma):
 
 Pendente de quem tem as contas (não dá para fazer daqui):
 
-1. Criar o repositório público no GitHub, trocar a origem (`git remote set-url origin <novo>`), dar push no
-   `main` e trocar `ENDERECO_DO_REPOSITORIO` no `COMECE-AQUI.md` pelo endereço real.
-2. Recomendado: publicação de teste seguindo o `COMECE-AQUI.md` em contas próprias (cópia privada,
+1. Recomendado: publicação de teste seguindo o `COMECE-AQUI.md` em contas próprias (cópia privada,
    Supabase, Vercel), rodar o backup manual na aba Actions, conferir login, uma venda e o backup no
    celular. Depois apagar o projeto de teste.
-3. Mandar ao Samuel o link do `COMECE-AQUI.md`.
+2. Mandar ao Samuel o link do `COMECE-AQUI.md`:
+   https://github.com/alexsandrejr/LojaUp/blob/main/COMECE-AQUI.md
 
 ## Alterações já feitas
 
