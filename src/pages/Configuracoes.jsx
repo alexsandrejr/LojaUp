@@ -163,7 +163,7 @@ function Backup() {
           <div className="card-header"><Cloud size={17} /><h3>Backup automático</h3></div>
           <div className="card-body col">
             {days == null || days > 2
-              ? <div className="alert alert-danger small"><TriangleAlert size={16} /><div>{days == null ? 'Nenhum backup feito ainda.' : `Último backup há ${days} dias.`} O backup automático roda todo dia pelo GitHub. Se ele parou, confira a aba Actions do repositório. Enquanto isso, baixe uma cópia ao lado.</div></div>
+              ? <div className="alert alert-danger small"><TriangleAlert size={16} /><div>{days == null ? 'Nenhum backup feito ainda.' : `Último backup há ${days} dias.`} O backup automático roda todo dia pelo GitHub. Se ele parou, confira a aba Actions do repositório. Enquanto isso, baixe uma cópia em “Baixar backup”.</div></div>
               : <div className="alert alert-success small"><CircleCheck size={16} /><div>Último backup: <b>{dateTime(info.lastBackup)}</b></div></div>}
             <div className="small muted">Todo dia, de madrugada, uma cópia completa dos dados é guardada no repositório privado do GitHub (pasta <span className="mono">backup</span>, ramo <span className="mono">backups</span>). O histórico do arquivo guarda as cópias de todos os dias.</div>
           </div>

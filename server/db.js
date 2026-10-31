@@ -429,6 +429,7 @@ function pgliteDriver(dataDir) {
   // Nome numa variável para a Vercel não empacotar o PGlite, que só serve em desenvolvimento
   const pglite = '@electric-sql/pglite';
   const { PGlite } = require(pglite);
+  if (dataDir) require('fs').mkdirSync(dataDir, { recursive: true });
   const db = new PGlite({
     dataDir: dataDir || undefined,
     parsers: { 1700: parseFloat, 1082: identity, 1114: identity, 1184: identity },

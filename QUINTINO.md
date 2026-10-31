@@ -117,7 +117,7 @@ Fases (marcar ao concluir, com commit ao fim de cada uma):
 - [x] 5. Impressão pelo navegador
 - [x] 6. Backup: GitHub Actions diário + baixar/restaurar em Configurações
 - [x] 7. Teste automático do roteiro (custo com frete, vendas, estoque, caixa, crediário, trocas)
-- [ ] 8. Layout para celular (menu, tabelas, formulários; PDV, Produtos, Estoque, Painel, Clientes)
+- [x] 8. Layout para celular (menu, tabelas, formulários; PDV, Produtos, Estoque, Painel, Clientes)
 - [ ] 9. `PUBLICAR.md`, publicação de teste e entrega ao Samuel
 
 ## Alterações já feitas
@@ -177,7 +177,11 @@ Outros comandos:
 
 - `npm test`: roda o roteiro completo da loja num banco na memória (`tests/roteiro.test.js`) e confere as
   contas principais. Também falha se alguma chamada da API ficar sem teste.
+- `npm run seed`: com o `npm run dev` rodando e o banco vazio, cria dados de exemplo (itens da planilha) e o
+  usuário de teste `admin` / `admin123`. Só para o banco local.
 - `npm run build`: gera as telas prontas para publicar em `dist/`.
+
+Para ver como fica no celular sem um celular: no Chrome, F12 › ícone de celular (Toggle device toolbar).
 
 ## Mapa do código
 

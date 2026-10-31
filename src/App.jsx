@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, ShoppingCart, Wallet, Receipt, Shirt, Boxes, Truck, Building2, Landmark, Users, CreditCard,
-  ChartColumn, Tag, Settings, LogOut, Store, Lock,
+  ChartColumn, Tag, Settings, LogOut, Store, Lock, Menu,
 } from 'lucide-react';
 import { api } from './api';
 import { Field } from './components/ui';
@@ -95,8 +95,12 @@ function Layout({ children }) {
   const base = '/' + loc.pathname.split('/')[1];
   const isAdmin = user.role === 'admin';
   const flush = base === '/pdv';
+  // No celular o menu é uma gaveta: abre pelo botão e fecha ao trocar de tela
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => { setMenuOpen(false); }, [loc.pathname]);
   return (
-    <div className="app">
+    <div className={`app ${menuOpen ? 'menu-open' : ''}`}>
+      <div className="sidebar-backdrop" onClick={() => setMenuOpen(false)} />
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-logo"><Store size={19} color="#fff" /></div>
@@ -120,12 +124,13 @@ function Layout({ children }) {
       </aside>
       <div className="main">
         <header className="topbar">
+          <button className="btn btn-ghost btn-icon menu-button" aria-label="Abrir menu" onClick={() => setMenuOpen(true)}><Menu size={20} /></button>
           <div className="topbar-title">{TITLES[base] || 'LojaUp'}</div>
           <div className="topbar-right">
             {cash
               ? <NavLink to="/caixa" className="badge badge-success" style={{ padding: '5px 10px' }}>● Caixa aberto</NavLink>
               : <NavLink to="/caixa" className="badge badge-danger" style={{ padding: '5px 10px' }}><Lock size={12} /> Caixa fechado</NavLink>}
-            <span className="muted small">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</span>
+            <span className="muted small topbar-date">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</span>
           </div>
         </header>
         <div className={`content ${flush ? 'flush' : ''}`}>{children}</div>

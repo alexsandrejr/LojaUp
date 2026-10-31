@@ -446,7 +446,7 @@ export default function PDV() {
               <div className="small">ou digite o nome, cor ou tamanho para buscar</div>
             </div>
           ) : (
-            <table className="table">
+            <table className="table pdv-cart">
               <thead><tr><th style={{ width: 30 }}>#</th><th>Produto</th><th className="num">Preço</th><th style={{ textAlign: 'center' }}>Qtd</th><th className="num">Desc. item</th><th className="num">Total</th><th /></tr></thead>
               <tbody>
                 {cart.map((i, idx) => (
@@ -460,7 +460,7 @@ export default function PDV() {
                         {i.stock - i.quantity < 0 && <span className="badge badge-warning" style={{ marginLeft: 6 }}>estoque: {i.stock}</span>}
                       </div>
                     </td>
-                    <td className="num" style={{ width: 120 }}>
+                    <td className="num" style={{ width: 120 }} data-label="Preço">
                       <MoneyInput className="btn-sm" style={{ height: 30 }} value={i.unit_price} onChange={(v) => updateItem(i.key, { unit_price: r2(v) })} onBlur={focusInput} />
                       {i.unit_price < i.list_price && <div className="small muted" style={{ textDecoration: 'line-through' }}>{brl(i.list_price)}</div>}
                     </td>
@@ -471,7 +471,7 @@ export default function PDV() {
                         <button onClick={() => updateItem(i.key, { quantity: i.quantity + 1 })}><Plus size={14} /></button>
                       </div>
                     </td>
-                    <td className="num" style={{ width: 110 }}>
+                    <td className="num" style={{ width: 110 }} data-label="Desconto">
                       <MoneyInput style={{ height: 30 }} value={i.discount || ''} placeholder="0,00" onChange={(v) => updateItem(i.key, { discount: r2(v) })} onBlur={focusInput} />
                     </td>
                     <td className="num strong">{brl(i.unit_price * i.quantity - (i.discount || 0))}</td>

@@ -12,7 +12,8 @@
   "scripts": {
     "dev": "concurrently -k -n api,vite -c magenta,cyan \"node --watch server/dev.js\" \"vite\"",
     "build": "vite build",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "seed": "node scripts/seed-dev.js"
   },
   "dependencies": {
     "jsbarcode": "^3.12.3",
