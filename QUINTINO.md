@@ -111,12 +111,12 @@ Fases (marcar ao concluir, com commit ao fim de cada uma):
 
 - [ ] 0. Repositório privado no GitHub e troca da origem (hoje aponta para `pixel444-dev/LojaUp`)
 - [x] 1. Tirar o Electron: entrada `api/` para a Vercel e servidor local para desenvolvimento
-- [ ] 2. Camada de banco compatível, esquema Postgres, `npm run migrate`, RLS ligado em todas as tabelas
-- [ ] 3. Portar os módulos da API para Postgres e fixar o fuso `America/Sao_Paulo`
+- [x] 2. Camada de banco compatível, esquema Postgres, `npm run migrate`, RLS ligado em todas as tabelas
+- [x] 3. Portar os módulos da API para Postgres e fixar o fuso `America/Sao_Paulo`
 - [ ] 4. Login com sessão em cookie, expiração e bloqueio por tentativas
 - [ ] 5. Impressão pelo navegador
 - [ ] 6. Backup: GitHub Actions diário + baixar/restaurar em Configurações
-- [ ] 7. Teste automático do roteiro (custo com frete, vendas, estoque, caixa, crediário, trocas)
+- [x] 7. Teste automático do roteiro (custo com frete, vendas, estoque, caixa, crediário, trocas)
 - [ ] 8. Layout para celular (menu, tabelas, formulários; PDV, Produtos, Estoque, Painel, Clientes)
 - [ ] 9. `PUBLICAR.md`, publicação de teste e entrega ao Samuel
 
@@ -167,11 +167,16 @@ telas aparecem na hora, e a API reinicia sozinha quando um arquivo de `server/` 
 
 No primeiro uso o sistema pede o nome da loja e cria o usuário administrador.
 
-Os dados de desenvolvimento ficam na pasta `.data/` do projeto (fora do git). Para começar do zero, pare o
-`npm run dev` e apague essa pasta.
+Sem a variável `DATABASE_URL`, o sistema usa o PGlite (um Postgres que roda dentro do Node) e grava os
+dados em `.data/pglite` (fora do git). Para começar do zero, pare o `npm run dev` e apague a pasta `.data`.
+Para usar um Postgres de verdade (por exemplo o Supabase), defina `DATABASE_URL` antes de rodar.
+
+As tabelas são criadas e atualizadas sozinhas na primeira chamada à API (migrações em `server/db.js`).
 
 Outros comandos:
 
+- `npm test`: roda o roteiro completo da loja num banco na memória (`tests/roteiro.test.js`) e confere as
+  contas principais. Também falha se alguma chamada da API ficar sem teste.
 - `npm run build`: gera as telas prontas para publicar em `dist/`.
 
 ## Mapa do código
@@ -179,12 +184,14 @@ Outros comandos:
 ```
 server/handler.js       despacha as chamadas "modulo.acao" para os módulos da API
 server/dev.js           servidor local de desenvolvimento (POST /api)
-server/db.js            banco de dados e migrações (adicione novas entradas em MIGRATIONS; nunca altere as antigas)
+server/db.js            banco Postgres (Supabase ou PGlite) e migrações (adicione novas entradas em MIGRATIONS;
+                        depois da primeira publicação, nunca altere as antigas)
 server/api/             regras de negócio: auth, products, sales, customers, purchases, finance, reports, backup
 src/api.js              chamada à API pelas telas
 src/pages/              telas React (PDV, Vendas, Compras, Estoque, Financeiro, Relatórios, Configurações...)
 src/components/ui.jsx   componentes compartilhados
 src/lib/print.js        cupom, recibo, carnê, etiquetas
+tests/roteiro.test.js   teste de ponta a ponta da API
 ```
 
 ## Roteiro de teste sugerido

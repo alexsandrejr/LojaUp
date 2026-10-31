@@ -1,14 +1,13 @@
 // Servidor local de desenvolvimento: recebe as chamadas da API em POST /api.
 // O Vite (porta 5173) repassa /api para cá.
 const http = require('http');
-const path = require('path');
 const dbm = require('./db');
 const { call } = require('./handler');
 
 const PORT = 5174;
 const ctx = { user: null };
 
-dbm.open(path.join(__dirname, '..', '.data'));
+dbm.open();
 
 http.createServer((req, res) => {
   if (req.method !== 'POST' || req.url !== '/api') {
