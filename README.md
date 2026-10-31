@@ -1,50 +1,30 @@
 <p align="center">
-  <img src=".github/assets/social-preview.png" alt="LojaUp — Sistema de gestão para lojas de roupas" width="100%">
+  <img src=".github/assets/social-preview.png" alt="LojaUp — Sistema de gestão para lojas" width="100%">
 </p>
 
 <p align="center">
   <a href="LICENSE"><img alt="Licença MIT" src="https://img.shields.io/badge/licen%C3%A7a-MIT-7c3aed?style=for-the-badge"></a>
-  <a href="https://github.com/pixel444-dev/LojaUp/releases/latest"><img alt="Baixar" src="https://img.shields.io/github/v/release/pixel444-dev/LojaUp?label=baixar&style=for-the-badge&color=4f46e5"></a>
-  <img alt="Windows" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&logo=windows11&logoColor=white">
 </p>
 
 <p align="center">
-  <img alt="Electron" src="https://img.shields.io/badge/Electron-47848F?style=flat-square&logo=electron&logoColor=white">
   <img alt="React" src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB">
-  <img alt="SQLite" src="https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white">
-  <img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white">
+  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white">
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white">
+  <img alt="Vercel" src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white">
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-3FCF8E?style=flat-square&logo=supabase&logoColor=white">
 </p>
 
 <p align="center">
-  <b>Sistema desktop para Windows, sem mensalidade e sem internet.</b><br>
-  Instala na máquina da loja e roda para sempre — os dados ficam no próprio computador.
+  <b>Sistema web de gestão para lojas, para usar no computador e no celular.</b><br>
+  Roda de graça na Vercel com o banco de dados no Supabase.
 </p>
 
 <p align="center">
   <a href="#-módulos">Módulos</a> ·
-  <a href="#-download">Download</a> ·
+  <a href="#-publicar">Publicar</a> ·
   <a href="#-desenvolvimento">Desenvolvimento</a> ·
-  <a href="#-instalando-no-cliente">Instalação no cliente</a> ·
-  <a href="#-open-source--pode-revender">Open source</a>
+  <a href="#-licença">Licença</a>
 </p>
-
----
-
-## 💜 Open source — pode revender
-
-O **LojaUp é 100% open source**, sob a [licença MIT](LICENSE). Isso quer dizer que **qualquer pessoa pode**:
-
-| | |
-|---|---|
-| ✅ **Usar** | na sua loja ou na de clientes, sem pagar nada |
-| ✅ **Clonar** | baixar o código-fonte completo |
-| ✅ **Modificar** | mudar telas, regras, cores, nome, o que quiser |
-| ✅ **Revender** | vender o sistema (original ou modificado) e cobrar por instalação, suporte ou mensalidade |
-| ✅ **Distribuir** | compartilhar cópias, com ou sem alterações |
-
-A única condição é manter o aviso de licença (o arquivo [`LICENSE`](LICENSE)) junto com o código. O software é fornecido “como está”, sem garantia.
-
-> Este repositório é mantido por [@pixel444-dev](https://github.com/pixel444-dev): qualquer pessoa pode ver, clonar e fazer *fork*, e sugestões são bem-vindas via *issues* e *pull requests*.
 
 ---
 
@@ -53,7 +33,7 @@ A única condição é manter o aviso de licença (o arquivo [`LICENSE`](LICENSE
 | Módulo | O que faz |
 |---|---|
 | 📊 **Painel do dono** | Resumo do dia/mês, projeção do mês, lucro e uma lista automática de alertas: contas atrasadas, crediário vencido, itens que vão acabar, dinheiro parado em encalhados, grade de tamanhos desequilibrada, perdas de estoque, diferenças de caixa, queda de faturamento, excesso de desconto, aniversariantes, clientes sumidos, backup atrasado. |
-| 🛒 **PDV (frente de caixa)** | Leitor de código de barras, busca por nome/cor/tamanho, `3*código` para quantidade, promoções automáticas, desconto por item ou na venda, pagamento dividido (dinheiro, Pix, débito, crédito parcelado, crediário, vale-troca), troco, cupom na impressora térmica. Atalhos: <kbd>F2</kbd> buscar, <kbd>F4</kbd> cliente, <kbd>F6</kbd> desconto, <kbd>F10</kbd> finalizar, <kbd>Esc</kbd> cancelar. |
+| 🛒 **PDV (frente de caixa)** | Leitor de código de barras, busca por nome/cor/tamanho, `3*código` para quantidade, promoções automáticas, desconto por item ou na venda, pagamento dividido (dinheiro, Pix, débito, crédito parcelado, crediário, vale-troca), troco, cupom na impressora térmica (pela impressão do navegador). Atalhos: <kbd>F2</kbd> buscar, <kbd>F4</kbd> cliente, <kbd>F6</kbd> desconto, <kbd>F10</kbd> finalizar, <kbd>Esc</kbd> cancelar. |
 | 💵 **Caixa** | Abertura com fundo de troco, sangria, suprimento, fechamento com conferência (esperado × contado), relatório impresso e histórico de diferenças. |
 | 🔁 **Vendas e trocas** | Histórico, reimpressão, cancelamento (devolve estoque e estorna), trocas e devoluções com vale-troca, dinheiro, estorno ou abatimento no crediário. |
 | 👕 **Produtos** | Cor, tamanho, marca, modelo, categoria; grade cor × tamanho gerada automaticamente; código de barras interno (EAN-13) quando a peça não tem; etiquetas com código de barras (folha A4 ou impressora de etiquetas); margem e markup. |
@@ -62,31 +42,22 @@ A única condição é manter o aviso de licença (o arquivo [`LICENSE`](LICENSE
 | 💰 **Financeiro** | Contas a pagar (fixas/variáveis, recorrentes) e a receber, fluxo de caixa realizado + previsto, DRE simplificado (lucro bruto e líquido) e ponto de equilíbrio. |
 | 🤝 **Clientes e crediário** | Cadastro, histórico de compras, preferências, limite de crédito, parcelas, juros e multa por atraso, recebimento com recibo, carnê, cobrança pelo WhatsApp, análise de inadimplência (aging) e nota de pontualidade do cliente. |
 | 📈 **Relatórios** | Faturamento diário/semanal/mensal, lucro por produto, curva ABC, encalhados com sugestão de desconto, sugestão de compra pelo ritmo de vendas, grade de tamanhos (vendas × estoque), vendas por categoria/marca/tamanho/cor/vendedor/pagamento/dia/horário, valor do estoque. |
-| ☁️ **Backup** | Automático ao fechar o sistema e a cada X horas, para o **OneDrive**, **pendrive** (qualquer pendrive conectado) e/ou outra pasta, mantendo os últimos N. Restauração com cópia de segurança. |
+| ☁️ **Backup** | Automático todo dia (GitHub Actions, num repositório privado) e botão para baixar uma cópia a qualquer hora. Restauração a partir do arquivo. |
 
 **Usuários:** **Administrador** (acesso total) e **Vendedor** (PDV, caixa, vendas, produtos, estoque, clientes — sem custos, financeiro e relatórios). Desconto acima do limite e crediário fora das regras pedem a senha do administrador.
 
 ---
 
-## 📥 Download
+## 🚀 Publicar
 
-Baixe o instalador **`LojaUp Setup.exe`** na página de [**Releases**](https://github.com/pixel444-dev/LojaUp/releases/latest). Basta copiar para a máquina da loja (pode ser por pendrive) e instalar — não precisa de internet nem de Node.js.
-
-> O Windows pode mostrar o aviso “O Windows protegeu o computador”, porque o instalador não tem assinatura digital paga. Clique em **Mais informações → Executar assim mesmo**.
+O passo a passo para colocar o sistema no ar (GitHub, Supabase e Vercel, todos no plano grátis) está em
+[**PUBLICAR.md**](PUBLICAR.md).
 
 ---
 
 ## 🔧 Desenvolvimento
 
-Requisitos: [Node.js](https://nodejs.org) 20 ou superior.
-
-```bash
-git clone https://github.com/pixel444-dev/LojaUp.git
-```
-
-```bash
-cd LojaUp
-```
+Requisitos: [Node.js](https://nodejs.org) 22 ou superior.
 
 ```bash
 npm install
@@ -96,62 +67,49 @@ npm install
 npm run dev
 ```
 
-Abre o app com recarregamento automático das telas (<kbd>F12</kbd> abre o DevTools). Em desenvolvimento os dados ficam em `%APPDATA%\LojaUp-dev`, separados da instalação real. Alterações em `electron/` exigem reiniciar o comando.
+Abra http://localhost:5173. Em desenvolvimento o banco é o [PGlite](https://pglite.dev) (Postgres que roda
+dentro do Node), gravado em `.data/`; não precisa instalar nada. Com a variável `DATABASE_URL`, o sistema
+usa um Postgres de verdade (o Supabase).
 
-### Gerar o instalador
-
-```bash
-npm run dist
-```
-
-O instalador fica em `release/LojaUp Setup 1.0.0.exe`.
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | Telas (Vite, porta 5173) e API local (porta 5174), com recarregamento automático |
+| `npm test` | Roteiro completo da loja num banco na memória, passando por todas as chamadas da API |
+| `npm run seed` | Dados de exemplo no banco local (com o `npm run dev` rodando) |
+| `npm run build` | Gera as telas prontas para publicar em `dist/` |
 
 ### Estrutura do código
 
 ```
-electron/          processo principal (Node)
-  main.js          janela, IPC, impressão, backup agendado
-  db.js            conexão SQLite e migrações
-  api/             regras de negócio (auth, products, sales, customers, purchases, finance, reports, backup)
-src/               interface React
-  pages/           telas
-  components/      componentes compartilhados
-  lib/print.js     modelos de cupom, recibo, carnê, vale-troca, fechamento de caixa e etiquetas
+api/index.js        função da Vercel (POST /api)
+server/             regras de negócio e banco
+  db.js             conexão Postgres (Supabase ou PGlite) e migrações
+  http.js           requisição HTTP e cookie da sessão
+  handler.js        despacha "modulo.acao" numa transação
+  session.js        login com sessão em cookie assinado
+  api/              auth, products, sales, customers, purchases, finance, reports, backup
+src/                telas React
+  pages/            telas
+  components/       componentes compartilhados
+  lib/print.js      cupom, recibo, carnê, vale-troca, fechamento de caixa e etiquetas
+scripts/backup.js   backup diário (GitHub Actions)
+tests/              testes de ponta a ponta
 ```
 
-Para evoluir o banco, adicione uma nova entrada no array `MIGRATIONS` em `electron/db.js` (nunca altere as anteriores) — a atualização é aplicada automaticamente quando o cliente abre a nova versão, sem perder dados.
-
----
-
-## 🏪 Instalando no cliente
-
-1. Rode o instalador e abra o LojaUp pelo atalho da área de trabalho.
-2. No primeiro uso, informe o nome da loja e crie o usuário administrador.
-3. **Configurações → Dados da loja**: CNPJ, endereço e telefone (saem no cupom).
-4. **Configurações → Impressora**: instale antes o driver Windows da térmica (Elgin, Bematech, Epson, Daruma…), selecione-a, escolha 80 ou 58 mm e marque “imprimir sem perguntar”. Use “Imprimir teste”.
-5. **Configurações → Backup**: clique em “Usar OneDrive” (o OneDrive precisa estar instalado e logado) e em “Pendrive”. Clique em “Fazer backup em todos os destinos” para testar.
-6. **Configurações → Usuários**: crie os vendedores.
-7. Leitor de código de barras: qualquer leitor USB que funcione como teclado (padrão de fábrica) já funciona no PDV, no inventário e nas compras.
-
-### Onde ficam os dados
-
-| O quê | Onde |
-|---|---|
-| Banco de dados | `%APPDATA%\LojaUp\dados\loja.db` |
-| Cópias locais automáticas | `%APPDATA%\LojaUp\dados\backups` |
-| OneDrive | `OneDrive\Backup LojaUp` |
-| Pendrive | pasta `Backup LojaUp` na raiz do pendrive |
-
-Para levar o sistema para outro computador: instale o LojaUp no novo computador, vá em **Configurações → Backup → Restaurar backup → Escolher arquivo…** e selecione o último backup.
+Para evoluir o banco, adicione uma nova entrada no array `MIGRATIONS` em `server/db.js` (nunca altere as
+anteriores): a atualização é aplicada sozinha no primeiro acesso depois da publicação, sem perder dados.
 
 ---
 
 ## 🧾 Observação fiscal
 
-O cupom impresso é **não fiscal**. Para emissão de NFC-e/NF-e é necessário integrar um emissor homologado (com certificado digital da loja) — o sistema já guarda todos os dados de venda necessários para isso.
+O cupom impresso é **não fiscal**. Para emissão de NFC-e/NF-e é necessário integrar um emissor homologado
+(com certificado digital da loja).
 
 ---
 
 ## 📄 Licença
 
-Distribuído sob a **licença MIT** — veja [`LICENSE`](LICENSE). Use, modifique e revenda à vontade. 💜
+Baseado no [LojaUp](https://github.com/pixel444-dev/LojaUp) de [@pixel444-dev](https://github.com/pixel444-dev),
+distribuído sob a **licença MIT** — veja [`LICENSE`](LICENSE). Esta versão troca o aplicativo desktop
+(Electron + SQLite) por um sistema web (Vercel + Supabase).

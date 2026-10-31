@@ -79,8 +79,9 @@ Decisões:
 
 - **Vercel** (telas + API) e **Supabase** (banco Postgres, região São Paulo), nos planos grátis.
   O Hobby da Vercel é, pelos termos, só para uso não comercial. O risco é baixo (sistema privado, um
-  usuário, pouco uso) e os dados ficam no Supabase: se a Vercel bloquear, só as telas saem do ar e dá para
-  publicá-las na Cloudflare Pages. Por isso o código não deve depender de nada específico da Vercel.
+  usuário, pouco uso) e os dados ficam no Supabase: se a Vercel bloquear, o site sai do ar mas nada se
+  perde. A API é uma função Node comum (`server/http.js`), fácil de levar para outro serviço Node
+  (Netlify, Render...). Por isso o código não deve depender de nada específico da Vercel.
 - Turso + Cloudflare foi descartado: limite de 10 ms de CPU e 50 chamadas externas por requisição no plano
   grátis da Cloudflare, e o Turso foi comprado pelo Supabase em 02/10/2026.
 - A transformação inteira é feita aqui. O Samuel só cria as contas, cola as variáveis de ambiente e publica,
@@ -111,14 +112,22 @@ Fases (marcar ao concluir, com commit ao fim de cada uma):
 
 - [ ] 0. Repositório privado no GitHub e troca da origem (hoje aponta para `pixel444-dev/LojaUp`)
 - [x] 1. Tirar o Electron: entrada `api/` para a Vercel e servidor local para desenvolvimento
-- [x] 2. Camada de banco compatível, esquema Postgres, `npm run migrate`, RLS ligado em todas as tabelas
+- [x] 2. Camada de banco compatível, esquema Postgres, migração automática, RLS ligado em todas as tabelas
 - [x] 3. Portar os módulos da API para Postgres e fixar o fuso `America/Sao_Paulo`
 - [x] 4. Login com sessão em cookie, expiração e bloqueio por tentativas
 - [x] 5. Impressão pelo navegador
 - [x] 6. Backup: GitHub Actions diário + baixar/restaurar em Configurações
 - [x] 7. Teste automático do roteiro (custo com frete, vendas, estoque, caixa, crediário, trocas)
 - [x] 8. Layout para celular (menu, tabelas, formulários; PDV, Produtos, Estoque, Painel, Clientes)
-- [ ] 9. `PUBLICAR.md`, publicação de teste e entrega ao Samuel
+- [ ] 9. `PUBLICAR.md` (feito), publicação de teste em contas próprias e entrega ao Samuel
+
+Pendente de quem tem as contas (não dá para fazer daqui):
+
+1. Criar o repositório **privado** no GitHub, trocar a origem (`git remote set-url origin <novo>`) e dar
+   push no `main`.
+2. Publicação de teste seguindo o `PUBLICAR.md` em contas próprias (Supabase + Vercel), rodar o backup
+   manual na aba Actions, conferir login, uma venda e o backup no celular. Depois apagar o projeto de teste.
+3. Transferir o repositório para o Samuel (Settings › Transfer) e ele segue o `PUBLICAR.md`.
 
 ## Alterações já feitas
 
